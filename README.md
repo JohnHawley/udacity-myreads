@@ -3,19 +3,22 @@
 
 A project for Udacity 'React Fundamentals' course.  This is John Hawley's submission for the project.
 
-## Install
+## Install & Start
 
 Requires Node.js (authored in `v7.8.0`)
 
 `npm install`
 
-## Start local devolpment server
-
 `yarn start`
 
 
 
+
+---
+
 # From Udacity Starter Template
+
+The following is useful infromation provided by Udacity's Starter Template
 
 ## Backend Server
 
