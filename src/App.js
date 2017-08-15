@@ -35,7 +35,7 @@ class BooksApp extends React.Component {
     }))
 
     //API request
-    BooksAPI.update(book.id, shelf).then(
+    BooksAPI.update(book, shelf).then(
       console.log('Called updateShelf: ', book.title, shelf)
     )
 
@@ -93,7 +93,7 @@ class BooksApp extends React.Component {
         )} />
 
         <Route path="/search" render={() => (
-          <SearchBooks updateShelf={this.updateShelf} />
+          <SearchBooks books={this.state.books} updateShelf={this.updateShelf} />
         )} />
 
       </div>

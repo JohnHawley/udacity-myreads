@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
+// External packages
+var _ = require('lodash')
+
 // Import API
 import * as BooksAPI from './../BooksAPI'
 
@@ -11,38 +14,45 @@ import ListBooks from './ListBooks.js';
 
 class SearchBooks extends Component {
     static propTypes = {
+        books: PropTypes.array,
         updateShelf: PropTypes.func.isRequired,
     }
 
     state = {
-        query: '',
         maxResults: 20,
-        books: []
+        booksQueried: []
     }
 
     // Issues with spaces and final query. triming trailing spaces disables spacebar input.
     // Issues with type speed, need to debounce the input and change state.
     updateQuery = (query) => {
-        this.setState({ query: query })
-    }
+        let trimmedQuery = query.replace(/^\s+/, '')
 
-    componentWillUpdate(nextProps, nextState) {
-        let trimmedQuery = nextState.query.replace(/^\s+/, '')
         trimmedQuery !== '' && (
-            BooksAPI.search(trimmedQuery, nextState.maxResults).then((books) => {
-                (nextState.books = books)
+            BooksAPI.search(trimmedQuery, this.state.maxResults).then((booksFromSearch) => {
+
+                // Get Books in myShelf
+                let myBooks = this.props.books.filter((book) => { return book.shelf !== 'none' })
+               
+                // Set defaults for shelf on searched books
+                booksFromSearch.map((books) => { return books.shelf = 'none' })
+
+                // Match book id
+                myBooks = _.intersectionBy(myBooks, booksFromSearch, 'id')
+
+                // Join the arrays together
+                booksFromSearch = _.unionBy(myBooks, booksFromSearch, 'id')
+
+                // Return array as setting the state
+                this.setState({ booksQueried: booksFromSearch })
             })
         )
     }
 
-    queryBooks = () => {
-        
-    }
-
     render() {
         // ES6 Variable declarations -- To refactor/cleanup code
-        const { books } = this.state
-        const { query } = this.state
+        const { booksQueried } = this.state
+        let query
 
         return (
             <div className="search-books">
@@ -61,15 +71,15 @@ class SearchBooks extends Component {
                             type='text'
                             placeholder='Search by title or author'
                             value={query}
-                            onChange={(event) => this.updateQuery(event.target.value)}
+                            onChange={ (event) => _.debounce(this.updateQuery(event.target.value), 200) }
                         />
                     </div>
                 </div>
 
                 <div className="search-books-results">
                     <ol className="books-grid">
-                        {books.error || (
-                            <ListBooks books={books} updateShelf={this.props.updateShelf} /> 
+                        {booksQueried.error || (
+                            <ListBooks books={booksQueried} updateShelf={this.props.updateShelf} /> 
                         )}
                     </ol>
                 </div>
