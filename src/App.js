@@ -46,11 +46,12 @@ class BooksApp extends Component {
       console.log('Called updateShelf: ', book.title, shelf)
     )
 
+    // Make toast alert
     this.addAlert(book.title, shelf)
   }
 
   addAlert = (book, shelf) => {
-    // Filter for readability
+    // Filter for readability for alert message
     switch (shelf) {
       case "read":
         shelf = 'Read';
@@ -67,6 +68,7 @@ class BooksApp extends Component {
       default:
         break;
     }
+    // Call alert message
     this.container.success(
       "Moved to " + shelf,
       book, {
@@ -78,9 +80,11 @@ class BooksApp extends Component {
   render() {
     return (
       <div className="app">
+        
         <ToastContainer ref={(input) => { this.container = input; }}
           toastMessageFactory={ToastMessageFactory}
           className="toast-bottom-left" />
+
         <Route exact path="/" render={() => (
           <div className="list-books">
             <div className="list-books-title">
