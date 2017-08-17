@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import ListBooks from './ListBooks';
 import PropTypes from 'prop-types'
+
+// Components
+import ListBooks from './ListBooks'
 
 /*
 *   Will take an array of book objs or ids and display them on a conditional category

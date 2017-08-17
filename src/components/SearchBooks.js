@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import PropTypes from 'prop-types'
 
 // External packages
-var _ = require('lodash')
+import PropTypes from 'prop-types'
+import _ from 'lodash'
 
 // Import API
 import * as BooksAPI from './../BooksAPI'
@@ -26,16 +26,15 @@ class SearchBooks extends Component {
     // Issues with spaces and final query. triming trailing spaces disables spacebar input.
     // Issues with type speed, need to debounce the input and change state.
     updateQuery = (query) => {
-        let trimmedQuery = query.replace(/^\s+/, '')
+        const trimmedQuery = query.replace(/^\s+/, '')
 
-        trimmedQuery !== '' && (
+        //  The following logic is LIKE: trimmedQuery !== '' && (    '' returns falsey so this conditional can be used instead
+        !!trimmedQuery && (
             BooksAPI.search(trimmedQuery, this.state.maxResults).then((booksFromSearch) => {
 
                 // Get Books in myShelf
-                let myBooks = this.props.books.filter((book) => { return book.shelf !== 'none' })
-               
-                // Set defaults for shelf on searched books
-                booksFromSearch.map((books) => { return books.shelf = 'none' })
+                let myBooks = this.props.books.filter(book => book.shelf !== 'none')
+                // ^ Use a shorter syntax with conditional for returning a arrow function instead of: .filter((book) => { return book.shelf !== 'none' })    
 
                 // Match book id
                 myBooks = _.intersectionBy(myBooks, booksFromSearch, 'id')
@@ -50,7 +49,7 @@ class SearchBooks extends Component {
     }
 
     render() {
-        // ES6 Variable declarations -- To refactor/cleanup code
+        // ES6 Variable declarations
         const { booksQueried } = this.state
         let query
 
@@ -71,7 +70,7 @@ class SearchBooks extends Component {
                             type='text'
                             placeholder='Search by title or author'
                             value={query}
-                            onChange={ (event) => _.debounce(this.updateQuery(event.target.value), 200) }
+                            onChange={(event) =>  this.updateQuery(event.target.value)}
                         />
                     </div>
                 </div>
@@ -79,7 +78,7 @@ class SearchBooks extends Component {
                 <div className="search-books-results">
                     <ol className="books-grid">
                         {booksQueried.error || (
-                            <ListBooks books={booksQueried} updateShelf={this.props.updateShelf} /> 
+                            <ListBooks books={booksQueried} updateShelf={this.props.updateShelf} />
                         )}
                     </ol>
                 </div>

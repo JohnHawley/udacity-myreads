@@ -1,7 +1,7 @@
-import React from 'react'
-import * as BooksAPI from './BooksAPI'
-var ReactToastr = require("react-toastr") // This is an alert component package
+import React, { Component } from 'react'
 import './App.css'
+import * as BooksAPI from './BooksAPI'
+import _ from 'lodash'
 
 // React routing
 import { Route, Link } from 'react-router-dom'
@@ -10,11 +10,12 @@ import { Route, Link } from 'react-router-dom'
 import SearchBooks from './components/SearchBooks'
 import Bookshelf from './components/Bookshelf'
 
-// Toastr alert component
-var { ToastContainer } = ReactToastr
-var ToastMessageFactory = React.createFactory(ReactToastr.ToastMessage.animation)
+// Toastr alert component via 'import' just ain't working quite right
+const ReactToastr = require('react-toastr')
+const { ToastContainer } = ReactToastr
+const ToastMessageFactory = React.createFactory(ReactToastr.ToastMessage.animation)
 
-class BooksApp extends React.Component {
+class BooksApp extends Component {
 
   state = {
     books: []
@@ -22,17 +23,23 @@ class BooksApp extends React.Component {
 
   componentDidMount() {
     BooksAPI.getAll().then((books) => {
-      this.setState({ books: books })  // Because their the same namespace we could just use "{ contacts }" here
+      this.setState({ books })  // Because theyre the same namespace we could just use "{ books }" here
     })
   }
 
   //Update a books shelf
   updateShelf = (book, shelf) => {
+    // Set new shelf
     book.shelf = shelf
 
-    this.setState(state => ({
-      books: state.books.concat([book])
-    }))
+    // Check if book is already stored in state
+    if (!_.some(this.state.books, ['id', book.id]))
+      this.setState(state => ({ books: this.state.books.concat(book) }))
+    else
+      this.setState(state => {
+        state.books[_.findIndex(state.books, ['id', book.id])].shelf = shelf
+        return { books: state.books };
+      })
 
     //API request
     BooksAPI.update(book, shelf).then(
