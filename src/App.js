@@ -32,6 +32,7 @@ class BooksApp extends Component {
     // Set new shelf
     book.shelf = shelf
 
+
     // Check if book is already stored in state
     if (!_.some(this.state.books, ['id', book.id]))
       this.setState(state => ({ books: this.state.books.concat(book) }))
@@ -40,6 +41,13 @@ class BooksApp extends Component {
         state.books[_.findIndex(state.books, ['id', book.id])].shelf = shelf
         return { books: state.books };
       })
+
+    // Nice way to check if the book is present! You can do this too with the find() function:
+    // 
+    // if (!!this.state.books.find(b => b.id === book.id)) {
+    // ...
+    // }
+    // The find() will return undefined if the element was not found, so you can use the not not operator to double check if the element exists or no.
 
     //API request
     BooksAPI.update(book, shelf).then(
@@ -80,7 +88,7 @@ class BooksApp extends Component {
   render() {
     return (
       <div className="app">
-        
+
         <ToastContainer ref={(input) => { this.container = input; }}
           toastMessageFactory={ToastMessageFactory}
           className="toast-bottom-left" />
